@@ -16,6 +16,10 @@ static std::mutex g_hooks_mux;
         - dll manual map modified binaries to target's space OR
         - directly modify new process module from the PEB
         - also, error logging...
+
+    NOTE:
+        If the new process is registered with exceptions, then the triggered exceptions only run in their context.
+        There will need to be another module loaded by the process OR registered and pointed to the EDR process.
  */
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
