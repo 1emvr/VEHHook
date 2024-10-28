@@ -1,6 +1,10 @@
 #include <windows.h>
+#include <mutex>
+#include <map>
 
+static bool g_veh_is_set = false;
 static std::map<FARPROC, BYTE> g_hooks{};
+static std::mutex g_hooks_mux;
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
@@ -47,30 +51,35 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
 BOOL HookFunction(const char *module_name, const char *func_name) {
 
+    bool success = false;
     uint8_t bp_opcode = 0xCC;
-    // only hook if veh already set
 
+    std::lock_guard<std::mutex> lock(g_hooks_mux);
+
+    // only hook if veh already set
     if (g_is_veh_set == false) {
         LOG_ERROR("hook_function : cannot hook while g_is_veh_set is false");
-        return false;
+        goto defer;
     }
         
     HMODULE module_base = GetModuleHandleA(module_name);
     if (!module_base) {
         LOG_ERROR("hook_function : GetModuleHandleA failed to resolve %s", module_name);
-        return false;
+        goto defer;
     }
 
     FARPROC func_base = GetProcAddress(module_base, func_name);
     if (!func_base) {
         LOG_ERROR("hook_function : GetProcAddress failed to resolve %s!%s", module_name, func_name);
-        return false;
+        goto defer;
     }
 
     // TODO: save byte and hooked function in a hashmap to unhook later
-    g_hooks.insert(func_base, func_base[0]);
+    g_hooks.insert( {func_base, func_base[0]} );
     bool success = WriteProcessMemory((HANDLE)(ULONG_PTR)-1, func_base, &bp_opcode, 1, nullptr);
 
+    success = true;
+ defer:
     return success;
 }
 
