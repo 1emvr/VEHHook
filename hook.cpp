@@ -19,7 +19,8 @@ static std::mutex g_hooks_mux;
 
     NOTE:
         If the new process is registered with exceptions, then the triggered exceptions only run in their context.
-        There will need to be another module loaded by the process OR pointed to the EDR process.
+        There will need to be another module loaded by the process OR exception handlers pointing to the EDR process.
+        Can we force a new VEH on an external process?
 
         This needs to be HIGHLY performant for the benefit of the user experience or else people will not be happy...
 
