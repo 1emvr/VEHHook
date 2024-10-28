@@ -52,9 +52,11 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 BOOL HookFunction(const char *module_name, const char *func_name) {
 
     bool success = false;
-    uint8_t bp_opcode = 0xCC;
+    uint8_t bp_opcode = 0xcc;
 
+    // set lock 
     std::lock_guard<std::mutex> lock(g_hooks_mux);
+    
 
     // only hook if veh already set
     if (g_is_veh_set == false) {
