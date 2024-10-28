@@ -3,11 +3,13 @@
 #include <map>
 
 static bool g_veh_is_set = false;
+
 static std::map<FARPROC, BYTE> g_hooks{};
 static std::mutex g_hooks_mux;
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
+    std::lock_guard<std::mutex> lock(g_hooks_mux);
     int32_t retval = EXCEPTION_CONTINUE_SEARCH;
 
     // breakpoint
@@ -80,7 +82,6 @@ BOOL HookFunction(const char *module_name, const char *func_name) {
     g_hooks.insert( {func_base, func_base[0]} );
     bool success = WriteProcessMemory((HANDLE)(ULONG_PTR)-1, func_base, &bp_opcode, 1, nullptr);
 
-    success = true;
  defer:
     return success;
 }
