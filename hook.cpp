@@ -57,7 +57,6 @@ BOOL HookFunction(const char *module_name, const char *func_name) {
 
     // set lock 
     std::lock_guard<std::mutex> lock(g_hooks_mux);
-    
 
     // only hook if veh already set
     if (g_veh_is_set == false) {
