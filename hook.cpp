@@ -8,6 +8,7 @@ static std::map<FARPROC, BYTE> g_hooks{};
 static std::mutex g_hooks_mux;
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
+    // repeating branch. Once for HWBP, once for trap
 
     std::lock_guard<std::mutex> lock(g_hooks_mux);
     int32_t retval = EXCEPTION_CONTINUE_SEARCH;
