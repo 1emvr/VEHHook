@@ -12,9 +12,10 @@ static std::mutex g_hooks_mux;
 
 /*
     TODO:
-        - alerts for new process creation
-        - dll manual map modified binaries to target's space OR
-        - directly modify new process module from the PEB
+        - Alerts for new process creation
+        - Dll manual map modified binaries to target's space OR
+        - Directly modify new process module from the PEB
+        - Add Google Detours as a dependency (?) https://github.com/microsoft/Detours
         - also, error logging...
 
     NOTE:
