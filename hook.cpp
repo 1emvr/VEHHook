@@ -36,10 +36,6 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
         for (g_hook_idx = g_hooks.begin(); g_hook_idx != g_hooks.end(); ++g_hook_idx) {
             if (exception->ContextRecord->Rip == (uintptr_t) g_hook_idx->first) {
 
-                // Implying that we are only able to hook ourselves. This will create a CoW module and the original is untouched
-                // how does this actually work??
-
-                
                 // unhook first byte and set the trap flag
                 WriteProcessMemory((HANDLE)(ULONG_PTR) -1, g_hook_idx->first, &g_hook_idx->second, 1, nullptr);
                 exception->ContextRecord->EFlags |= 0x100;
