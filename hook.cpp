@@ -14,6 +14,7 @@ static std::mutex g_hooks_mux;
     TODO:
         - Alerts for new process creation
         - Very simple process injection for registering VEH Handle
+        - Very simple KM driver early process blocking/signals
         - Dll manual map modified binaries to target's space OR modify new process module from the PEB
         - Add Microsoft Detours as a dependency (?) https://github.com/microsoft/Detours
         - also, error logging...
