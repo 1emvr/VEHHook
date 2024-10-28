@@ -22,6 +22,11 @@ static std::mutex g_hooks_mux;
         There will need to be another module loaded by the process OR pointed to the EDR process.
 
         This needs to be HIGHLY performant for the benefit of the user experience or else people will not be happy...
+
+        (Theorized) Steps to acomplish this:
+            - Kernel mode driver registered with ETW listens for process creation events and stops the process early
+            - Kernel driver signals to UM process to inline hook modules from the PEB
+            - Execution continue (?)
  */
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
@@ -69,7 +74,8 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 }
 
 // TODO: Register with ETW to listen for process-creation events. Likely needs to be a kernel driver
-// TODO: Early cascade injection (?) Setting hooks from the PEB:w
+// TODO: Early cascade injection (?) Setting hooks from the PEB
+
 
 BOOL HookFunction(const char *module_name, const char *func_name) {
 
