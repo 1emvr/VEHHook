@@ -68,9 +68,8 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
     return retval;
 }
 
-// TODO: Need a module to intercept process creation and set these hooks
+// TODO: Register with ETW to listen for process-creation events
 // TODO: Early cascade injection (?) Setting hooks from the PEB:w
-
 
 BOOL HookFunction(const char *module_name, const char *func_name) {
 
