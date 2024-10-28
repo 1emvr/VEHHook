@@ -19,7 +19,7 @@ static std::mutex g_hooks_mux;
 
     NOTE:
         If the new process is registered with exceptions, then the triggered exceptions only run in their context.
-        There will need to be another module loaded by the process OR registered and pointed to the EDR process.
+        There will need to be another module loaded by the process OR pointed to the EDR process.
  */
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
