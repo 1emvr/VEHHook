@@ -1,7 +1,9 @@
 #include <windows.h>
+#include <cstdint>
 #include <mutex>
 #include <map>
 
+static uint8_t bp_opcode = 0xcc;
 static bool g_veh_is_set = false;
 
 static std::map<FARPROC, BYTE> g_hooks{};
@@ -37,9 +39,7 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
         for (g_hook_idx = g_hooks.begin(); g_hook_idx != g_hooks.end(); ++g_hook_idx) {
             if ((exception->ContextRecord->Rip - (uintptr_t) g_hook_idx->first) < 8) {
 
-                uint8_t bp_opcode = 0xCC;
                 WriteProcessMemory((HANDLE)(ULONG_PTR) -1, g_hook_idx->first, &bp_opcode, 1, nullptr);
-
                 exception->ContextRecord->EFlags &= ~0x100;
                 retval = EXCEPTION_CONTINUE_EXECUTION;
 
@@ -53,10 +53,8 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
 BOOL HookFunction(const char *module_name, const char *func_name) {
 
-    bool success = false;
-    uint8_t bp_opcode = 0xcc;
-
     // set lock 
+    bool success = false;
     std::lock_guard<std::mutex> lock(g_hooks_mux);
 
     // only hook if veh already set
