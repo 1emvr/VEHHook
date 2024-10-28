@@ -12,13 +12,14 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
     std::lock_guard<std::mutex> lock(g_hooks_mux);
     int32_t retval = EXCEPTION_CONTINUE_SEARCH;
 
+    // breakpoint (first)
     if (exception->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT) {
-        std::map<FARPROC, BYTE>::iterator fn_index;
+        std::map<FARPROC, BYTE>::iterator g_hook_idx;
 
-        for (fn_index = g_hooks.begin(); fn_index != g_hooks.end(); ++fn_index) {
-            if (exception->ContextRecord->Rip == (uintptr_t) fn_index->first) {
+        for (g_hook_idx = g_hooks.begin(); g_hook_idx != g_hooks.end(); ++g_hook_idx) {
+            if (exception->ContextRecord->Rip == (uintptr_t) g_hook_idx->first) {
 
-                WriteProcessMemory((HANDLE)(ULONG_PTR) -1, fn_index->first, &fn_index->second, 1, nullptr);
+                WriteProcessMemory((HANDLE)(ULONG_PTR) -1, g_hook_idx->first, &g_hook_idx->second, 1, nullptr);
                 exception->ContextRecord->EFlags |= 0x100;
 
                 // TODO: dispatch analysis by type??
@@ -29,15 +30,15 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
             }
         }
     }
-    // trap flag
+    // trap flag (second)
     else if (exception->ExceptionRecord->ExceptionCode == EXCEPTION_SINGLE_STEP) {
-        std::map<FARPROC, BYTE>::iterator fn_index;
+        std::map<FARPROC, BYTE>::iterator g_hook_idx;
 
-        for (fn_index = g_hooks.begin(); fn_index != g_hooks.end(); ++fn_index) {
-            if ((exception->ContextRecord->Rip - (uintptr_t) fn_index->first) < 8) {
+        for (g_hook_idx = g_hooks.begin(); g_hook_idx != g_hooks.end(); ++g_hook_idx) {
+            if ((exception->ContextRecord->Rip - (uintptr_t) g_hook_idx->first) < 8) {
 
                 uint8_t bp_opcode = 0xCC;
-                WriteProcessMemory((HANDLE)(ULONG_PTR) -1, fn_index->first, &bp_opcode, 1, nullptr);
+                WriteProcessMemory((HANDLE)(ULONG_PTR) -1, g_hook_idx->first, &bp_opcode, 1, nullptr);
 
                 exception->ContextRecord->EFlags &= ~0x100;
                 retval = EXCEPTION_CONTINUE_EXECUTION;
