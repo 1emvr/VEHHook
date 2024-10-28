@@ -8,23 +8,21 @@ static std::map<FARPROC, BYTE> g_hooks{};
 static std::mutex g_hooks_mux;
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
-    // repeating branch. Once for HWBP, once for trap
 
     std::lock_guard<std::mutex> lock(g_hooks_mux);
     int32_t retval = EXCEPTION_CONTINUE_SEARCH;
 
-    // breakpoint
     if (exception->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT) {
         std::map<FARPROC, BYTE>::iterator fn_index;
 
         for (fn_index = g_hooks.begin(); fn_index != g_hooks.end(); ++fn_index) {
             if (exception->ContextRecord->Rip == (uintptr_t) fn_index->first) {
 
-                // unhook and set the trap flag
                 WriteProcessMemory((HANDLE)(ULONG_PTR) -1, fn_index->first, &fn_index->second, 1, NULL);
                 exception->ContextRecord->EFlags |= 0x100;
 
                 // TODO: dispatch analysis by type??
+                // Will this be a consumer?
 
                 retval = EXCEPTION_CONTINUE_EXECUTION;
                 break;
