@@ -9,7 +9,14 @@ static bool g_veh_is_set = false;
 static std::map<FARPROC, BYTE> g_hooks{};
 static std::mutex g_hooks_mux;
 
-// TODO: error logging
+
+/*
+    TODO:
+        - alerts for new process creation
+        - dll manual map modified binaries to target's space OR
+        - directly modify new process module from the PEB
+        - also, error logging...
+ */
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
