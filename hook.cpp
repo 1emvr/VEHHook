@@ -13,16 +13,16 @@ static std::mutex g_hooks_mux;
 /*
     TODO:
         - Alerts for new process creation
-        - Dll manual map modified binaries to target's space OR
-        - Directly modify new process module from the PEB
+        - Very simple process injection for registering VEH Handle
+        - Dll manual map modified binaries to target's space OR modify new process module from the PEB
         - Add Microsoft Detours as a dependency (?) https://github.com/microsoft/Detours
         - also, error logging...
 
     NOTE:
         If the new process is registered with exceptions, then the triggered exceptions only run in their context.
         There will need to be another module loaded by the process OR exception handlers pointing to the EDR process.
-        Can we force a new VEH on an external process?
 
+        Can we force a new VEH on an external process? (yes)
         This needs to be HIGHLY performant for the benefit of the user experience or else people will not be happy...
 
         (Theorized) Steps to acomplish this:
