@@ -9,6 +9,8 @@ static bool g_veh_is_set = false;
 static std::map<FARPROC, BYTE> g_hooks{};
 static std::mutex g_hooks_mux;
 
+// TODO: error logging
+
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
     std::lock_guard<std::mutex> lock(g_hooks_mux);
