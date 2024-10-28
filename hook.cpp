@@ -39,8 +39,8 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
                 // Implying that we are only able to hook ourselves. This will create a CoW module and the original is untouched
                 // how does this actually work??
 
-                // ANSWER: Have to map our copy into process memory of any target 
-
+                
+                // unhook first byte and set the trap flag
                 WriteProcessMemory((HANDLE)(ULONG_PTR) -1, g_hook_idx->first, &g_hook_idx->second, 1, nullptr);
                 exception->ContextRecord->EFlags |= 0x100;
 
@@ -59,10 +59,11 @@ LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
         for (g_hook_idx = g_hooks.begin(); g_hook_idx != g_hooks.end(); ++g_hook_idx) {
             if ((exception->ContextRecord->Rip - (uintptr_t) g_hook_idx->first) < 8) {
 
+                // re-hook first byte and unset trap flag
                 WriteProcessMemory((HANDLE)(ULONG_PTR) -1, g_hook_idx->first, &bp_opcode, 1, nullptr);
                 exception->ContextRecord->EFlags &= ~0x100;
-                retval = EXCEPTION_CONTINUE_EXECUTION;
 
+                retval = EXCEPTION_CONTINUE_EXECUTION;
                 break;
             }
         }
