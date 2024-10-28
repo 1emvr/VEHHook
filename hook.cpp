@@ -1,3 +1,6 @@
+#include <windows.h>
+
+static std::map<FARPROC, BYTE> g_hooks{};
 
 LONG WINAPI ExceptionHandler(_EXCEPTION_POINTERS *exception) {
 
@@ -65,9 +68,9 @@ BOOL HookFunction(const char *module_name, const char *func_name) {
     }
 
     // TODO: save byte and hooked function in a hashmap to unhook later
+    g_hooks.insert(func_base, func_base[0]);
     bool success = WriteProcessMemory((HANDLE)(ULONG_PTR)-1, func_base, &bp_opcode, 1, nullptr);
 
-    // TODO: append std::map<FARPROC, BYTE> g_hooks list
     return success;
 }
 
